@@ -166,6 +166,7 @@ describe 'consul' do
       },
     }}
     it { should contain_archive('/dir1/archives/consul_web_ui-0.7.4.zip').with(:source => 'https://releases.hashicorp.com/consul/0.7.4/consul_0.7.4_web_ui.zip') }
+    it { should contain_file('/dir1').that_comes_before('Archive[/dir1/archives/consul_web_ui-0.7.4.zip]') }
     it { should contain_file('/dir1/dir2').that_requires('Archive[/dir1/archives/consul_web_ui-0.7.4.zip]') }
     it { should contain_file('/dir1/dir2').with(:ensure => 'symlink') }
   end
