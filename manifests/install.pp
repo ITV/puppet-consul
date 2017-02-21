@@ -11,6 +11,9 @@ class consul::install {
       group  => $::consul::group,
       mode   => '0755',
     }
+    $archive_requires = File[$::consul::data_dir]
+  } else {
+    $archive_requires = undef
   }
 
   case $::consul::install_method {
@@ -40,6 +43,7 @@ class consul::install {
         extract      => true,
         extract_path => "${install_path}/consul-${consul::version}",
         creates      => "${install_path}/consul-${consul::version}/consul",
+        require      => $archive_requires,
       }->
       file {
         "${install_path}/consul-${consul::version}/consul":
@@ -72,6 +76,7 @@ class consul::install {
           extract      => true,
           extract_path => "${install_path}/consul-${consul::version}_web_ui",
           creates      => $archive_creates,
+          require      => $archive_requires,
         }->
         file { $::consul::ui_dir:
           ensure => 'symlink',
