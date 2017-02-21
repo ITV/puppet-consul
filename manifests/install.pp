@@ -32,10 +32,11 @@ class consul::install {
       file { [
         $install_path,
         "${install_path}/consul-${consul::version}"]:
-        ensure => directory,
-        owner  => 'root',
-        group  => 0, # 0 instead of root because OS X uses "wheel".
-        mode   => '0555';
+        ensure  => directory,
+        owner   => 'root',
+        group   => 0, # 0 instead of root because OS X uses "wheel".
+        mode    => '0555',
+        require => $archive_requires,
       }->
       archive { "${install_path}/consul-${consul::version}.${consul::download_extension}":
         ensure       => present,
@@ -47,13 +48,15 @@ class consul::install {
       }->
       file {
         "${install_path}/consul-${consul::version}/consul":
-          owner => 'root',
-          group => 0, # 0 instead of root because OS X uses "wheel".
-          mode  => '0555';
+          owner   => 'root',
+          group   => 0, # 0 instead of root because OS X uses "wheel".
+          mode    => '0555',
+          require => $archive_requires;
         "${consul::bin_dir}/consul":
-          ensure => link,
-          notify => $do_notify_service,
-          target => "${install_path}/consul-${consul::version}/consul";
+          ensure  => link,
+          notify  => $do_notify_service,
+          target  => "${install_path}/consul-${consul::version}/consul",
+          require => $archive_requires;
       }
 
       if ($::consul::ui_dir and $::consul::data_dir) {
@@ -68,7 +71,8 @@ class consul::install {
         }
 
         file { "${install_path}/consul-${consul::version}_web_ui":
-          ensure => directory,
+          ensure  => directory,
+          require => $archive_requires,
         }->
         archive { "${install_path}/consul_web_ui-${consul::version}.zip":
           ensure       => present,
